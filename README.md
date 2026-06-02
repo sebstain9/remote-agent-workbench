@@ -4,6 +4,12 @@ Remote Agent Workbench is a local-first control surface for running AI coding ta
 
 It creates an isolated git worktree, lets Codex implement the requested change, asks Claude Code to review the staged diff, runs verification, and only then creates a local commit.
 
+## Demo
+
+![Remote Agent Workbench demo](docs/demo/remote-agent-workbench-demo.gif)
+
+## Desktop
+
 ![Remote Agent Workbench desktop screenshot](docs/screenshots/desktop.png)
 
 ## Why
