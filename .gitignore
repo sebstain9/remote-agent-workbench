@@ -1,0 +1,10 @@
+node_modules
+dist
+.env
+.env.*
+.DS_Store
+*.log
+.codex-autonomy/
+.remote-agent-workbench/
+ui-*.png
+*.tsbuildinfo
