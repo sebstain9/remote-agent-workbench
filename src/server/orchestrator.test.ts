@@ -4,11 +4,12 @@ import { basename, join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { type AgentAdapters } from "./agents.js";
 import { type AppConfig } from "./config.js";
+import { createDemoTask } from "./demo.js";
 import { getHealth } from "./health.js";
 import { TaskOrchestrator } from "./orchestrator.js";
 import { runCommand } from "./process.js";
 import { TaskStore } from "./store.js";
-import { discoverWorkspaces } from "./workspaces.js";
+import { defaultWorkspaceRoots, discoverWorkspaces } from "./workspaces.js";
 import { getDiffOrEmpty } from "./git.js";
 
 const tempRoots: string[] = [];
@@ -27,9 +28,28 @@ describe("Remote Agent Workbench core loop", () => {
     });
 
     expect(health.ok).toBe(false);
+    expect(health.appOk).toBe(true);
+    expect(health.demoOk).toBe(true);
+    expect(health.checks.find((check) => check.name === "node")?.ok).toBe(true);
     expect(health.checks.find((check) => check.name === "git")?.ok).toBe(true);
     expect(health.checks.find((check) => check.name === "codex")?.ok).toBe(false);
     expect(health.checks.find((check) => check.name === "claude")?.ok).toBe(false);
+  });
+
+  it("creates a complete demo run without agent binaries or a target repo", async () => {
+    const config = await makeConfig();
+    const store = new TaskStore(config.workRoot);
+
+    const task = await createDemoTask(store);
+    const detail = await store.getTaskDetail(task.id);
+
+    expect(task.mode).toBe("demo");
+    expect(task.status).toBe("done");
+    expect(task.codex?.exitCode).toBe(0);
+    expect(task.review?.verdict).toBe("pass");
+    expect(task.test?.exitCode).toBe(0);
+    expect(task.diff).toContain("loadSavedFilters");
+    expect(detail?.logs.join("\n")).toContain("Mock local commit");
   });
 
   it("rejects dirty target repositories before creating a task", async () => {
@@ -69,6 +89,20 @@ describe("Remote Agent Workbench core loop", () => {
 
     expect(candidates.find((candidate) => candidate.name === basename(cleanRepo))?.clean).toBe(true);
     expect(candidates.find((candidate) => candidate.name === basename(dirtyRepo))?.clean).toBe(false);
+  });
+
+  it("uses RAW_WORKSPACE_ROOTS as an explicit discovery scope", () => {
+    const previous = process.env.RAW_WORKSPACE_ROOTS;
+    process.env.RAW_WORKSPACE_ROOTS = "/tmp/raw-one,/tmp/raw-two";
+    try {
+      expect(defaultWorkspaceRoots("/tmp/ignored")).toEqual(["/tmp/raw-one", "/tmp/raw-two"]);
+    } finally {
+      if (previous === undefined) {
+        delete process.env.RAW_WORKSPACE_ROOTS;
+      } else {
+        process.env.RAW_WORKSPACE_ROOTS = previous;
+      }
+    }
   });
 
   it("creates a worktree, reviews, verifies, and commits when all gates pass", async () => {
@@ -264,6 +298,8 @@ async function makeConfig(): Promise<AppConfig> {
   return {
     port: 0,
     host: "127.0.0.1",
+    appRoot: process.cwd(),
+    launchCwd: process.cwd(),
     workRoot: join(root, "state"),
     gitBin: "git",
     codexBin: "codex",

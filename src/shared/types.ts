@@ -52,6 +52,7 @@ export type TestResult = {
 
 export type Task = {
   id: string;
+  mode?: "real" | "demo";
   title: string;
   prompt: string;
   workspacePath: string;
@@ -78,15 +79,20 @@ export type TaskDetail = Task & {
 };
 
 export type HealthCheck = {
-  name: "git" | "codex" | "claude";
+  name: "node" | "git" | "codex" | "claude";
+  label: string;
   ok: boolean;
+  requiredFor: "app" | "real-run";
   path?: string;
   version?: string;
   error?: string;
+  installCommand?: string;
 };
 
 export type HealthResponse = {
   ok: boolean;
+  appOk: boolean;
+  demoOk: boolean;
   checks: HealthCheck[];
 };
 

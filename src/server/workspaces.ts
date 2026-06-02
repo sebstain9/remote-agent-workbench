@@ -25,7 +25,7 @@ const SKIPPED_DIRS = new Set([
 export async function discoverWorkspaces(
   config: AppConfig,
   store: TaskStore,
-  roots = defaultWorkspaceRoots(),
+  roots = defaultWorkspaceRoots(config.launchCwd),
   limit = 24
 ): Promise<WorkspaceCandidate[]> {
   const candidates = new Map<string, WorkspaceCandidate>();
@@ -50,12 +50,13 @@ export async function discoverWorkspaces(
     .slice(0, limit);
 }
 
-export function defaultWorkspaceRoots(): string[] {
+export function defaultWorkspaceRoots(baseDirectory = process.cwd()): string[] {
   const envRoots = (process.env.RAW_WORKSPACE_ROOTS ?? "")
     .split(",")
     .map((value) => value.trim())
     .filter(Boolean);
-  return unique([process.cwd(), dirname(process.cwd()), homedir(), ...envRoots].map((path) => resolve(path)));
+  if (envRoots.length > 0) return unique(envRoots.map((path) => resolve(path)));
+  return unique([baseDirectory, dirname(baseDirectory), homedir(), ...envRoots].map((path) => resolve(path)));
 }
 
 async function addCandidate(

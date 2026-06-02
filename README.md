@@ -28,6 +28,9 @@ Remote Agent Workbench turns that loop into a small local web app.
 
 ## What It Does
 
+- starts from `npx` without cloning the repository
+- lets new users load a complete demo run before installing every agent CLI
+- checks local setup with a built-in Setup Doctor
 - discovers nearby git repositories and marks dirty repos
 - rejects dirty target repositories before starting
 - creates a temporary branch and git worktree per task
@@ -53,6 +56,10 @@ V1 is intentionally local-first and conservative.
 
 ## Requirements
 
+Demo Mode only needs Node.js 22+.
+
+Real runs need:
+
 - macOS, Linux, or another Unix-like development machine
 - Node.js 22+
 - Git
@@ -63,23 +70,52 @@ The app still loads without Codex or Claude installed, but the health chips will
 
 ## Quick Start
 
+Run it directly from GitHub:
+
 ```bash
-npm install
-npm run dev
+npx github:sebstain9/remote-agent-workbench
 ```
 
-Open the printed local URL, usually:
+Then open the printed local URL, usually:
 
 ```text
 http://localhost:5177
 ```
 
-Production-style run:
+Click **Try demo** first if Codex or Claude Code is not installed yet.
+
+Local development:
+
+```bash
+npm install
+npm run dev
+```
+
+Production-style run after cloning:
 
 ```bash
 npm run build
 npm start
 ```
+
+The package also exposes a CLI entrypoint for npm publishing:
+
+```bash
+npx remote-agent-workbench
+```
+
+That command works once the package name is published to npm.
+
+## Setup Doctor
+
+The app checks the tools needed for real runs:
+
+- Node.js 22+
+- Git
+- Codex CLI
+- Claude Code CLI
+
+Missing tools are shown in the UI with install commands. Demo Mode still works without Codex or Claude Code, so new users can inspect the workflow before completing setup.
 
 ## Verification
 

@@ -125,6 +125,7 @@ h1 {
 
 .refresh-button,
 .primary-button,
+.secondary-button,
 .task-row,
 .text-button {
   border: 0;
@@ -214,6 +215,44 @@ h1 {
 .task-form {
   display: grid;
   gap: 11px;
+}
+
+.demo-card,
+.setup-doctor {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 14px;
+  padding: 12px;
+  border: 1px solid #dbe7ff;
+  border-radius: 8px;
+  background: #f7faff;
+}
+
+.demo-card p,
+.doctor-summary,
+.doctor-row p {
+  color: #667287;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.secondary-button {
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border-radius: 8px;
+  color: #1d4ed8;
+  background: #e7efff;
+  font-size: 13px;
+  font-weight: 850;
+}
+
+.secondary-button:disabled {
+  color: #6e7a8f;
+  background: #e9eef7;
+  cursor: not-allowed;
 }
 
 label {
@@ -322,6 +361,7 @@ textarea:focus {
 }
 
 .form-error,
+.form-note,
 .error-banner {
   color: #8d1f1f;
   background: #fff3f3;
@@ -329,6 +369,12 @@ textarea:focus {
   border-radius: 8px;
   padding: 10px;
   line-height: 1.45;
+}
+
+.form-note {
+  color: #7a5200;
+  background: #fff8eb;
+  border-color: #efd39d;
 }
 
 .run-steps {
@@ -346,6 +392,71 @@ textarea:focus {
   color: #4d596d;
   font-size: 13px;
   font-weight: 760;
+}
+
+.setup-doctor {
+  margin-top: 0;
+  margin-bottom: 14px;
+  border-color: #d9dee7;
+  background: #fbfcfd;
+}
+
+.doctor-summary.ok {
+  color: #166534;
+}
+
+.doctor-summary.warn {
+  color: #7a5200;
+}
+
+.doctor-list {
+  display: grid;
+  gap: 8px;
+}
+
+.doctor-row {
+  display: grid;
+  gap: 5px;
+  padding: 9px;
+  border: 1px solid #e2e7ef;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.doctor-row.warn {
+  border-color: #efd39d;
+  background: #fffdf7;
+}
+
+.doctor-row-head {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 7px;
+  color: #2b3447;
+}
+
+.doctor-row-head strong {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+}
+
+.doctor-row-head small {
+  color: #667287;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.doctor-row code {
+  padding: 6px 7px;
+  border: 1px solid #e8edf5;
+  border-radius: 6px;
+  background: #f6f8fb;
+  font-size: 11px;
 }
 
 .task-items {
@@ -442,6 +553,27 @@ textarea:focus {
   font-size: 12px;
   font-weight: 850;
   white-space: nowrap;
+}
+
+.detail-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.mode-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 9px;
+  border: 1px solid #dbe7ff;
+  border-radius: 999px;
+  color: #1d4ed8;
+  background: #eef4ff;
+  font-size: 12px;
+  font-weight: 850;
 }
 
 .result-grid {

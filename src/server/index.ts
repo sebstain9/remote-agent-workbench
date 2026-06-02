@@ -4,6 +4,7 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createProductionAgents } from "./agents.js";
 import { loadConfig } from "./config.js";
+import { createDemoTask } from "./demo.js";
 import { getDiffOrEmpty } from "./git.js";
 import { getHealth } from "./health.js";
 import { TaskOrchestrator } from "./orchestrator.js";
@@ -48,6 +49,14 @@ app.post("/api/tasks", async (req, res, next) => {
     const input = createTaskSchema.parse(req.body);
     const task = await orchestrator.createTask(input);
     res.status(201).json(task);
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.post("/api/demo/tasks", async (_req, res, next) => {
+  try {
+    res.status(201).json(await createDemoTask(store));
   } catch (error) {
     next(error);
   }
@@ -100,7 +109,7 @@ app.listen(config.port, config.host, () => {
 
 async function attachFrontend(server: express.Express): Promise<void> {
   if (process.env.NODE_ENV === "production") {
-    const dist = resolve(__dirname, "../../dist/client");
+    const dist = resolve(config.appRoot, "dist/client");
     server.use(express.static(dist));
     server.get("*", (_req, res) => res.sendFile(resolve(dist, "index.html")));
     return;
@@ -108,13 +117,14 @@ async function attachFrontend(server: express.Express): Promise<void> {
 
   const { createServer } = await import("vite");
   const vite = await createServer({
+    root: config.appRoot,
     server: { middlewareMode: true },
     appType: "spa"
   });
   server.use(vite.middlewares);
   server.use("*", async (req, res, next) => {
     try {
-      const indexPath = resolve(process.cwd(), "index.html");
+      const indexPath = resolve(config.appRoot, "index.html");
       const template = existsSync(indexPath) ? indexPath : resolve(__dirname, "../../index.html");
       const html = await vite.transformIndexHtml(req.originalUrl, await import("node:fs/promises").then((fs) => fs.readFile(template, "utf8")));
       res.status(200).set({ "Content-Type": "text/html" }).end(html);

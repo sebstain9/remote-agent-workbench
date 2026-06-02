@@ -12,6 +12,8 @@ function expandHome(input: string): string {
 export type AppConfig = {
   port: number;
   host: string;
+  appRoot: string;
+  launchCwd: string;
   workRoot: string;
   gitBin: string;
   codexBin: string;
@@ -23,6 +25,8 @@ export function loadConfig(): AppConfig {
   return {
     port: Number(process.env.RAW_PORT ?? 5177),
     host: process.env.RAW_HOST ?? "0.0.0.0",
+    appRoot: expandHome(process.env.RAW_APP_ROOT ?? process.cwd()),
+    launchCwd: expandHome(process.env.RAW_LAUNCH_CWD ?? process.cwd()),
     workRoot: expandHome(process.env.RAW_WORK_ROOT ?? "~/.remote-agent-workbench"),
     gitBin: process.env.RAW_GIT_BIN ?? "git",
     codexBin: process.env.RAW_CODEX_BIN ?? "codex",

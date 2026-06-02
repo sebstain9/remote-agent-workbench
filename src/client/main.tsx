@@ -12,11 +12,14 @@ import {
   Play,
   RefreshCw,
   ShieldCheck,
+  Sparkles,
   TerminalSquare,
+  Wrench,
   XCircle
 } from "lucide-react";
 import {
   type CreateTaskInput,
+  type HealthCheck,
   type HealthResponse,
   type Task,
   type TaskDetail,
@@ -56,6 +59,7 @@ function App() {
   const [manualWorkspace, setManualWorkspace] = useState(false);
   const [isLoadingWorkspaces, setIsLoadingWorkspaces] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isCreatingDemo, setIsCreatingDemo] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -87,6 +91,7 @@ function App() {
   const selectedWorkspace = workspaces.find((workspace) => workspace.path === form.workspacePath);
   const selectedWorkspaceDirty = selectedWorkspace?.clean === false;
   const canSubmit =
+    Boolean(health?.ok) &&
     !isSubmitting &&
     !selectedWorkspaceDirty &&
     Boolean(form.workspacePath.trim()) &&
@@ -138,6 +143,22 @@ function App() {
     }
   }
 
+  async function createDemoRun() {
+    setError("");
+    setIsCreatingDemo(true);
+    try {
+      const task = await postJson<Task>("/api/demo/tasks", {});
+      setTasks((current) => [task, ...current.filter((existing) => existing.id !== task.id)]);
+      setSelectedId(task.id);
+      await loadDetail(task.id);
+      void refreshAll();
+    } catch (demoError) {
+      setError(demoError instanceof Error ? demoError.message : String(demoError));
+    } finally {
+      setIsCreatingDemo(false);
+    }
+  }
+
   return (
     <main className="app-shell">
       <header className="topbar">
@@ -162,6 +183,14 @@ function App() {
             </div>
             <StatusPill health={health} />
           </div>
+
+          <DemoModeCard
+            disabled={isCreatingDemo}
+            health={health}
+            onCreate={() => void createDemoRun()}
+          />
+
+          <SetupDoctor health={health} />
 
           <form className="task-form" onSubmit={submitTask}>
             <div className="section-heading">
@@ -209,6 +238,7 @@ function App() {
               />
             </label>
             {selectedWorkspaceDirty ? <p className="form-error">This repository has uncommitted changes. Clean it before starting.</p> : null}
+            {health && !health.ok ? <p className="form-note">Real runs unlock when Setup Doctor is green. Demo Mode is available now.</p> : null}
             {error ? <p className="form-error">{error}</p> : null}
             <button
               className="primary-button"
@@ -258,6 +288,32 @@ function App() {
         </aside>
       </section>
     </main>
+  );
+}
+
+function DemoModeCard({
+  disabled,
+  health,
+  onCreate
+}: {
+  disabled: boolean;
+  health: HealthResponse | null;
+  onCreate: () => void;
+}) {
+  return (
+    <section className="demo-card" aria-label="Demo mode">
+      <div>
+        <div className="section-heading">
+          <Sparkles size={17} />
+          <h3>Demo Mode</h3>
+        </div>
+        <p>{health?.ok ? "Preview the full gate flow before touching a repository." : "Preview a complete run before installing every agent CLI."}</p>
+      </div>
+      <button className="secondary-button" type="button" disabled={disabled} onClick={onCreate}>
+        <Play size={15} />
+        <span>{disabled ? "Loading..." : "Try demo"}</span>
+      </button>
+    </section>
   );
 }
 
@@ -326,6 +382,40 @@ function RepositoryPicker({
   );
 }
 
+function SetupDoctor({ health }: { health: HealthResponse | null }) {
+  const checks = health?.checks ?? [];
+  return (
+    <section className="setup-doctor" aria-label="Setup Doctor">
+      <div className="section-heading">
+        <Wrench size={17} />
+        <h3>Setup Doctor</h3>
+      </div>
+      <p className={health?.ok ? "doctor-summary ok" : "doctor-summary warn"}>
+        {setupSummary(health)}
+      </p>
+      <div className="doctor-list">
+        {checks.map((check) => (
+          <SetupRow check={check} key={check.name} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function SetupRow({ check }: { check: HealthCheck }) {
+  return (
+    <div className={check.ok ? "doctor-row ok" : "doctor-row warn"}>
+      <div className="doctor-row-head">
+        {check.ok ? <CheckCircle2 size={14} /> : <AlertTriangle size={14} />}
+        <strong>{check.label}</strong>
+        <small>{check.requiredFor === "app" ? "app" : "real run"}</small>
+      </div>
+      <p>{check.version || check.error || "Not detected"}</p>
+      {!check.ok && check.installCommand ? <code>{check.installCommand}</code> : null}
+    </div>
+  );
+}
+
 function WorkspaceSummary({ workspace }: { workspace: WorkspaceCandidate }) {
   return (
     <div className={workspace.clean ? "repo-summary" : "repo-summary warn"}>
@@ -349,7 +439,10 @@ function TaskDetailView({ task, detail, diff }: { task: Task; detail: TaskDetail
           <h2>{task.title}</h2>
           <p>{statusLabels[task.status]} · {duration}</p>
         </div>
-        <StatusBadge status={task.status} />
+        <div className="detail-actions">
+          {task.mode === "demo" ? <span className="mode-badge">Demo</span> : null}
+          <StatusBadge status={task.status} />
+        </div>
       </div>
 
       {task.error ? <div className="error-banner">{task.error}</div> : null}
@@ -424,10 +517,11 @@ function StatusPill({ health }: { health: HealthResponse | null }) {
   }
 
   const ok = health.ok;
+  const demoReady = !ok && health.demoOk;
   return (
     <span className={ok ? "status-pill ok" : "status-pill warn"}>
       {ok ? <CheckCircle2 size={14} /> : <AlertTriangle size={14} />}
-      {ok ? "Ready" : "Tool issue"}
+      {ok ? "Ready" : demoReady ? "Demo ready" : "Setup needed"}
     </span>
   );
 }
@@ -480,6 +574,13 @@ function StatusBadge({ status }: { status: TaskStatus }) {
 
 function verdictLabel(verdict: "pass" | "fail"): string {
   return verdict === "pass" ? "Pass" : "Fail";
+}
+
+function setupSummary(health: HealthResponse | null): string {
+  if (!health) return "Checking local runtime and agent tools.";
+  if (health.ok) return "Ready for real Codex and Claude Code runs.";
+  if (health.demoOk) return "Demo runs are ready; install missing real-run tools when needed.";
+  return "Install the app runtime first, then reload this page.";
 }
 
 function statusTone(status: TaskStatus): string {
