@@ -1,0 +1,4 @@
+interface:
+  display_name: "Safe Agent Worktree"
+  short_description: "Run AI coding tasks in safe git worktrees"
+  default_prompt: "Use $safe-agent-worktree to make this code change in an isolated git worktree, review the diff, run verification, and leave the main repository untouched."

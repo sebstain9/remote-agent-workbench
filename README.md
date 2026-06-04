@@ -1,8 +1,50 @@
 # Remote Agent Workbench
 
-Remote Agent Workbench is a local-first control surface for running AI coding tasks with guardrails.
+Remote Agent Workbench is a local-first safety kit for AI coding tasks.
 
-It creates an isolated git worktree, lets Codex implement the requested change, asks Claude Code to review the staged diff, runs verification, and only then creates a local commit.
+Start small with the downloadable **Safe Agent Worktree** Codex skill. It gives any coding agent one reliable habit: create an isolated git worktree, keep the main checkout clean, review the diff, run verification, and block unreviewed files created after tests.
+
+Use the full Workbench app when you want a local web control surface around the same loop: Codex implements, Claude Code reviews, verification runs, and only then a local commit is created.
+
+## Start With The Skill
+
+Install the skill from this repository:
+
+```bash
+git clone https://github.com/sebstain9/remote-agent-workbench.git
+mkdir -p ~/.codex/skills
+cp -R remote-agent-workbench/skills/safe-agent-worktree ~/.codex/skills/
+```
+
+Then ask Codex:
+
+```text
+Use $safe-agent-worktree to make this change in an isolated git worktree, review the diff, run npm test, and leave my main checkout untouched.
+```
+
+You can also run the bundled helper directly:
+
+```bash
+node ~/.codex/skills/safe-agent-worktree/scripts/safe-agent-worktree.mjs start --title "fix login redirect"
+```
+
+The skill is intentionally small: Node.js + Git, no server, no account, no cloud queue.
+
+## Full Workbench App
+
+Run the local web workbench directly from GitHub:
+
+```bash
+npx github:sebstain9/remote-agent-workbench
+```
+
+Then open the printed local URL, usually:
+
+```text
+http://localhost:5177
+```
+
+Click **Try demo** first if Codex or Claude Code is not installed yet.
 
 ## Demo
 
@@ -28,6 +70,7 @@ Remote Agent Workbench turns that loop into a small local web app.
 
 ## What It Does
 
+- ships a downloadable Codex skill for safe worktree-based AI coding tasks
 - starts from `npx` without cloning the repository
 - lets new users load a complete demo run before installing every agent CLI
 - checks local setup with a built-in Setup Doctor
@@ -56,7 +99,13 @@ V1 is intentionally local-first and conservative.
 
 ## Requirements
 
-Demo Mode only needs Node.js 22+.
+The Safe Agent Worktree skill needs:
+
+- Node.js
+- Git
+- a git repository with a clean working tree
+
+Demo Mode for the full app only needs Node.js 22+.
 
 Real runs need:
 
@@ -70,7 +119,7 @@ The app still loads without Codex or Claude installed, but the health chips will
 
 ## Quick Start
 
-Run it directly from GitHub:
+Run the full app directly from GitHub:
 
 ```bash
 npx github:sebstain9/remote-agent-workbench
@@ -98,7 +147,7 @@ npm run build
 npm start
 ```
 
-The package also exposes a CLI entrypoint for npm publishing:
+The package also exposes a full-app CLI entrypoint for npm publishing:
 
 ```bash
 npx remote-agent-workbench

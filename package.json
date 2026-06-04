@@ -1,7 +1,7 @@
 {
   "name": "remote-agent-workbench",
   "version": "0.1.0",
-  "description": "A local-first workbench for running AI coding tasks through isolated worktrees, review gates, verification, and local commits.",
+  "description": "A downloadable Codex skill and local-first workbench for safe AI coding tasks in isolated git worktrees.",
   "license": "MIT",
   "type": "module",
   "bin": {
@@ -9,14 +9,29 @@
   },
   "keywords": [
     "codex",
+    "codex-skill",
     "claude-code",
     "ai-agents",
     "coding-agents",
     "developer-tools",
     "git-worktree",
+    "worktree-safety",
     "local-first",
     "agent-orchestration",
     "workflow-automation"
+  ],
+  "files": [
+    "bin",
+    "dist",
+    "docs",
+    "skills",
+    "src",
+    "index.html",
+    "package.json",
+    "README.md",
+    "LICENSE",
+    "tsconfig.json",
+    "vite.config.ts"
   ],
   "repository": {
     "type": "git",
