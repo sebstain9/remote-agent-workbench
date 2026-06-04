@@ -1,7 +1,7 @@
 {
   "name": "remote-agent-workbench",
   "version": "0.1.0",
-  "description": "A downloadable Codex skill and local-first workbench for safe AI coding tasks in isolated git worktrees.",
+  "description": "Downloadable Codex safety skills and a local-first workbench for safer AI coding tasks.",
   "license": "MIT",
   "type": "module",
   "bin": {
@@ -14,8 +14,13 @@
     "ai-agents",
     "coding-agents",
     "developer-tools",
+    "agent-safety",
     "git-worktree",
     "worktree-safety",
+    "code-review",
+    "debugging",
+    "bdd",
+    "git-safety",
     "local-first",
     "agent-orchestration",
     "workflow-automation"

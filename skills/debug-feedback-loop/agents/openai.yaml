@@ -1,0 +1,6 @@
+interface:
+  display_name: "Debug Feedback Loop"
+  short_description: "Reproduce bugs before trying to fix them."
+  default_prompt: "Use $debug-feedback-loop to reproduce this bug, rank hypotheses, instrument the cause, and verify the fix."
+policy:
+  allow_implicit_invocation: true

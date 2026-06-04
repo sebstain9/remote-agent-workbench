@@ -1,0 +1,6 @@
+interface:
+  display_name: "Agent Git Guardrails"
+  short_description: "Block dangerous git commands from agents."
+  default_prompt: "Use $agent-git-guardrails to install and verify a local hook that blocks dangerous git commands from AI agents."
+policy:
+  allow_implicit_invocation: true

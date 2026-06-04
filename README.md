@@ -2,33 +2,52 @@
 
 Remote Agent Workbench is a local-first safety kit for AI coding tasks.
 
-Start small with the downloadable **Safe Agent Worktree** Codex skill. It gives any coding agent one reliable habit: create an isolated git worktree, keep the main checkout clean, review the diff, run verification, and block unreviewed files created after tests.
+Start small with the downloadable **Agent Safety Skill Pack**. It gives any coding agent a few reliable habits: clarify behavior before coding, isolate work in a git worktree, review the result before delivery, debug from a repeatable feedback loop, and block dangerous git commands.
 
 Use the full Workbench app when you want a local web control surface around the same loop: Codex implements, Claude Code reviews, verification runs, and only then a local commit is created.
 
-## Start With The Skill
+## Start With The Skills
 
-Install the skill from this repository:
+Install every skill from this repository:
 
 ```bash
 git clone https://github.com/sebstain9/remote-agent-workbench.git
 mkdir -p ~/.codex/skills
-cp -R remote-agent-workbench/skills/safe-agent-worktree ~/.codex/skills/
+cp -R remote-agent-workbench/skills/* ~/.codex/skills/
 ```
 
-Then ask Codex:
+Or install only one:
+
+```bash
+cp -R remote-agent-workbench/skills/safe-agent-worktree ~/.codex/skills/
+cp -R remote-agent-workbench/skills/review-gate ~/.codex/skills/
+cp -R remote-agent-workbench/skills/behavior-contract ~/.codex/skills/
+cp -R remote-agent-workbench/skills/debug-feedback-loop ~/.codex/skills/
+cp -R remote-agent-workbench/skills/agent-git-guardrails ~/.codex/skills/
+```
+
+Useful starting prompts:
 
 ```text
 Use $safe-agent-worktree to make this change in an isolated git worktree, review the diff, run npm test, and leave my main checkout untouched.
+
+Use $behavior-contract to turn this request into scenarios, acceptance criteria, and a verification plan before coding.
+
+Use $review-gate to audit this change for blockers, missing validation, and release risks before delivery.
+
+Use $debug-feedback-loop to reproduce this bug, rank hypotheses, instrument the cause, and verify the fix.
+
+Use $agent-git-guardrails to install and verify a local hook that blocks dangerous git commands from AI agents.
 ```
 
 You can also run the bundled helper directly:
 
 ```bash
 node ~/.codex/skills/safe-agent-worktree/scripts/safe-agent-worktree.mjs start --title "fix login redirect"
+echo '{"tool_input":{"command":"git push origin main"}}' | node ~/.codex/skills/agent-git-guardrails/scripts/block-dangerous-git.mjs
 ```
 
-The skill is intentionally small: Node.js + Git, no server, no account, no cloud queue.
+The skills are intentionally small: Markdown playbooks plus tiny local scripts where determinism matters. No server, no account, no cloud queue.
 
 ## Full Workbench App
 
@@ -70,7 +89,11 @@ Remote Agent Workbench turns that loop into a small local web app.
 
 ## What It Does
 
-- ships a downloadable Codex skill for safe worktree-based AI coding tasks
+- ships downloadable Codex skills for safer AI coding tasks
+- clarifies behavior and acceptance criteria before implementation
+- reviews generated work for concrete blockers before delivery
+- guides debugging through repeatable feedback loops instead of guesses
+- blocks dangerous git commands from agent hooks
 - starts from `npx` without cloning the repository
 - lets new users load a complete demo run before installing every agent CLI
 - checks local setup with a built-in Setup Doctor
@@ -99,11 +122,12 @@ V1 is intentionally local-first and conservative.
 
 ## Requirements
 
-The Safe Agent Worktree skill needs:
+The skill pack needs:
 
 - Node.js
 - Git
-- a git repository with a clean working tree
+
+`safe-agent-worktree` also needs a git repository with a clean working tree.
 
 Demo Mode for the full app only needs Node.js 22+.
 

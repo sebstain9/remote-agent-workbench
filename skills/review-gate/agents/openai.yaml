@@ -1,0 +1,6 @@
+interface:
+  display_name: "Review Gate"
+  short_description: "Find blockers before an agent says done."
+  default_prompt: "Use $review-gate to audit this change for blockers, missing validation, and release risks before delivery."
+policy:
+  allow_implicit_invocation: true

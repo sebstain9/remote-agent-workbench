@@ -1,0 +1,6 @@
+interface:
+  display_name: "Behavior Contract"
+  short_description: "Clarify AI coding tasks before implementation."
+  default_prompt: "Use $behavior-contract to turn this request into scenarios, acceptance criteria, and a verification plan before coding."
+policy:
+  allow_implicit_invocation: true
